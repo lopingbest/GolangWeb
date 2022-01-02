@@ -34,7 +34,13 @@ func TestServerMxx(t *testing.T) {
 	mux.HandleFunc("/hi", func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprint(writer, "Hi")
 	})
-
+	//url pattern
+	mux.HandleFunc("/images/", func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprint(writer, "Hello Images")
+	})
+	mux.HandleFunc("/images/thumbnails/", func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprint(writer, "Thumbnail")
+	})
 	server := http.Server{
 		Addr:    "localhost:8080",
 		Handler: mux,
