@@ -32,3 +32,21 @@ func ResponseHeader(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("X-Powered-By", "Telkom Indonesia")
 	fmt.Fprint(w, "OK")
 }
+
+func TestResponseHeader(t *testing.T) {
+	request := httptest.NewRequest(http.MethodPost, "http://localhost:8080/", nil)
+	//case in sensitive, bebas besar kecil "content-type"
+	request.Header.Add("Content-Type", "application/json")
+
+	recorder := httptest.NewRecorder()
+
+	ResponseHeader(recorder, request)
+
+	response := recorder.Result()
+	body, _ := io.ReadAll(response.Body)
+
+	fmt.Println(string(body))
+
+	//cek headerResponse
+	fmt.Println(response.Header.Get("x-powered-by"))
+}
