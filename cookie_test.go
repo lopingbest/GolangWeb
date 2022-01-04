@@ -3,12 +3,14 @@ package Golang_web
 import (
 	"fmt"
 	"net/http"
+	"net/http/httptest"
+	"testing"
 )
 
 //menulis cookie response http
 func SetCookie(w http.ResponseWriter, r *http.Request) {
 	cookie := new(http.Cookie)
-	cookie.Name = "X=PZN-Name"
+	cookie.Name = "X-PZN-Name"
 	cookie.Value = r.URL.Query().Get("name")
 
 	http.SetCookie(w, cookie)
@@ -23,5 +25,36 @@ func GetCookie(w http.ResponseWriter, r *http.Request) {
 	} else {
 		name := cookie.Value
 		fmt.Fprintf(w, "Hello %s", name)
+	}
+}
+
+//dummie server
+func TestCookie(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/set-cookie", SetCookie)
+	mux.HandleFunc("/get-cookie", GetCookie)
+
+	//dummie server
+	server := http.Server{
+		Addr:    "localhost:8080",
+		Handler: mux,
+	}
+	err := server.ListenAndServe()
+	if err != nil {
+		panic(err)
+	}
+}
+
+//test cookie
+func TestSetCookie(t *testing.T) {
+	request := httptest.NewRequest(http.MethodGet, "http:localhost:8080/?name=Galih", nil)
+	recorder := httptest.NewRecorder()
+
+	SetCookie(recorder, request)
+
+	cookies := recorder.Result().Cookies()
+
+	for _, cookie := range cookies {
+		fmt.Printf("Cookie %s:%s \n", cookie.Name, cookie.Value)
 	}
 }
