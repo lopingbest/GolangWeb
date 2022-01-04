@@ -2,6 +2,7 @@ package Golang_web
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -57,4 +58,19 @@ func TestSetCookie(t *testing.T) {
 	for _, cookie := range cookies {
 		fmt.Printf("Cookie %s:%s \n", cookie.Name, cookie.Value)
 	}
+}
+
+func TestGetCookie(t *testing.T) {
+	request := httptest.NewRequest(http.MethodGet, "http:localhost:8080/?name=Galih", nil)
+	cookie := new(http.Cookie)
+	cookie.Name = "X-PZN-Name"
+	cookie.Value = "Galih"
+	request.AddCookie(cookie)
+
+	recorder := httptest.NewRecorder()
+
+	GetCookie(recorder, request)
+
+	body, _ := io.ReadAll(recorder.Result().Body)
+	fmt.Println(string(body))
 }
