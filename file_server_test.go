@@ -2,6 +2,7 @@ package Golang_web
 
 import (
 	"embed"
+	"io/fs"
 	"net/http"
 	"testing"
 )
@@ -30,8 +31,10 @@ func TestFileServer(t *testing.T) {
 var resources embed.FS
 
 func TestFileServerGolangEmbed(t *testing.T) {
+
+	directory, _ := fs.Sub(resources, "resources")
 	//mengkonversi resources bawaan golang embed menuju http filesistem
-	fileserver := http.FileServer(http.FS(resources))
+	fileserver := http.FileServer(http.FS(directory))
 
 	mux := http.NewServeMux()
 	//menghapus prefix di url
