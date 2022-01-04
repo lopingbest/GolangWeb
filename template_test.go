@@ -1,6 +1,7 @@
 package Golang_web
 
 import (
+	"embed"
 	"fmt"
 	"io"
 	"net/http"
@@ -43,6 +44,39 @@ func TestHTMLFile(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	SimpleHTMLFile(recorder, request)
+
+	body, _ := io.ReadAll(recorder.Result().Body)
+	fmt.Println(string(body))
+}
+
+func TemplateDirectory(w http.ResponseWriter, r *http.Request) {
+	t := template.Must(template.ParseGlob("./template/*.gohtml"))
+	t.ExecuteTemplate(w, "simple.gohtml", "Hello HTML Template")
+}
+
+func TestTemplateDirectory(t *testing.T) {
+	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080", nil)
+	recorder := httptest.NewRecorder()
+
+	TemplateDirectory(recorder, request)
+
+	body, _ := io.ReadAll(recorder.Result().Body)
+	fmt.Println(string(body))
+}
+
+//go:embed template/*gohtml
+var templates embed.FS
+
+func TemplateEmbed(w http.ResponseWriter, r *http.Request) {
+	t := template.Must(template.ParseFS(templates, "template/*.gohtml"))
+	t.ExecuteTemplate(w, "simple.gohtml", "Hello HTML Template")
+}
+
+func TestTemplateEmbed(t *testing.T) {
+	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080", nil)
+	recorder := httptest.NewRecorder()
+
+	TemplateEmbed(recorder, request)
 
 	body, _ := io.ReadAll(recorder.Result().Body)
 	fmt.Println(string(body))
